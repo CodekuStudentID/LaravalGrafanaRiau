@@ -50,7 +50,7 @@ Route::get('/terms-of-services', [WebsiteController::class, 'Terms'])->name('web
 Route::get('/about', [WebsiteController::class, 'About'])->name('web.about');
 Route::get('/contacts', [WebsiteController::class, 'Contacts'])->name('web.contacts');
 Route::get('/category/{slug}', [WebsiteController::class, 'categoryPost'])->name('web.category');
-Route::get('/contributor', [WebsiteController::class, 'jurnalis'])->name('web.jurnalis');
+Route::get('/junalis', [WebsiteController::class, 'jurnalis'])->name('web.jurnalis');
 
 // Jalankan ini dulu untuk tes koneksi
 Route::get('/cek-koneksi', [ArtisanController::class, 'test']);

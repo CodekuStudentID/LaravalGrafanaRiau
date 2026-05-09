@@ -13,7 +13,7 @@
 
         <div class="grid md:grid-cols-2 gap-8">
 
-            <a href="/admin/login" class="group relative bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-transparent hover:border-emerald-500 transition-all duration-500 shadow-xl hover:shadow-emerald-200/50 flex flex-col items-center text-center overflow-hidden" wire:navigate>
+            <a href="{{route('user.login')}}" class="group relative bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-transparent hover:border-emerald-500 transition-all duration-500 shadow-xl hover:shadow-emerald-200/50 flex flex-col items-center text-center overflow-hidden" wire:navigate>
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <i class="fa-solid fa-shield-halved text-8xl text-emerald-900"></i>
                 </div>
@@ -28,7 +28,7 @@
                 <span class="mt-auto px-6 py-2 bg-slate-900 text-white text-xs font-bold rounded-full group-hover:bg-emerald-600 transition-colors">MASUK PANEL ADMIN <i class="fa-solid fa-arrow-right ml-2"></i></span>
             </a>
 
-            <a href="{{ route('user.login') }}" class="group relative bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-transparent hover:border-emerald-500 transition-all duration-500 shadow-xl hover:shadow-emerald-200/50 flex flex-col items-center text-center overflow-hidden" wire:navigate>
+            {{-- <a href="{{ route('user.login') }}" class="group relative bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-transparent hover:border-emerald-500 transition-all duration-500 shadow-xl hover:shadow-emerald-200/50 flex flex-col items-center text-center overflow-hidden" wire:navigate>
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                     <i class="fa-solid fa-comments text-8xl text-emerald-900"></i>
                 </div>
@@ -41,10 +41,10 @@
                 <p class="text-sm text-slate-500 leading-relaxed mb-6">Masuk sebagai pembaca untuk berdiskusi, memberikan komentar, dan berlangganan berita terbaru.</p>
 
                 <span class="mt-auto px-6 py-2 bg-slate-900 text-white text-xs font-bold rounded-full group-hover:bg-emerald-600 transition-colors">MASUK SEBAGAI USER <i class="fa-solid fa-arrow-right ml-2"></i></span>
-            </a>
-            
+            </a> --}}
+
 <div class="group relative bg-gray-500/50 backdrop-blur-xl p-8 rounded-[2.5rem] border-2 border-dashed border-slate-300 transition-all duration-500 flex flex-col items-center text-center overflow-hidden cursor-not-allowed">
-    
+
     <div class="absolute top-4 left-4 flex items-center gap-2 bg-slate-900 text-white px-3 py-1 rounded-full z-20 shadow-lg">
         <i class="fa-solid fa-lock text-[10px]"></i>
         <span class="text-[9px] font-black uppercase tracking-widest">Coming Soon</span>
@@ -73,8 +73,8 @@
 </div>
 
         </div>
-        
-        
+
+
 
         <div class="mt-12 text-center">
             <a href="/" class="text-emerald-700 font-bold hover:underline decoration-2 underline-offset-4 transition text-sm" wire:navigate>
