@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Filament\Resources\PostResource\Pages;
 
 use App\Filament\Resources\PostResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Database\Eloquent\Builder; // Import ini
+use Filament\Resources\Components\Tab;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListPosts extends ListRecords
 {
@@ -17,13 +19,28 @@ class ListPosts extends ListRecords
         ];
     }
 
-    // TAMBAHKAN FUNGSI INI UNTUK MENGUNCI QUERY
-    protected function applyFiltersToTableQuery(Builder $query): Builder
+    /**
+     * Membuat Tab Filter di atas Tabel
+     */
+    public function getTabs(): array
     {
-        if (auth()->user()->role !== 'admin') {
-            $query->where('user_id', auth()->id());
-        }
+        return [
+            'all' => Tab::make('Semua Berita'),
 
-        return $query;
+            'pengajuan' => Tab::make('Pengajuan')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'pending'))
+                ->badge(\App\Models\Post::where('status', 'pending')->count())
+                ->badgeColor('warning'),
+
+            'terbit' => Tab::make('Telah Terbit')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'published'))
+                ->badge(\App\Models\Post::where('status', 'published')->count())
+                ->badgeColor('success'),
+
+            'ditolak' => Tab::make('Ditolak')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('status', 'rejected'))
+                ->badge(\App\Models\Post::where('status', 'rejected')->count())
+                ->badgeColor('danger'),
+        ];
     }
 }

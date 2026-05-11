@@ -4,43 +4,68 @@ namespace App\Filament\Widgets;
 
 use App\Models\Visitor;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class VisitorChart extends ChartWidget
 {
-    protected static ?string $heading = 'Grafik Pembaca (7 Hari Terakhir)';
+    use InteractsWithPageFilters; // Penting untuk menangkap data dari filter luar
+
+    protected static ?string $heading = 'Grafik Pengunjung';
     protected static ?int $sort = 1;
 
     protected function getData(): array
-{
-    // Ambiak data 7 hari terakhir
-    $days = collect(range(6, 0))->map(function($i) {
-        return now()->subDays($i)->format('Y-m-d');
-    });
+    {
+        $user = auth()->user();
+        $isAdmin = $user->email === 'admin@gmail.com';
 
-    $visitors = \App\Models\Visitor::selectRaw('DATE(accessed_at) as date, count(*) as count')
-        ->where('accessed_at', '>=', now()->subDays(7))
-        ->groupBy('date')
-        ->pluck('count', 'date');
+        // 1. Ambil Tanggal dari Filter (Jika tidak ada, default 7 hari terakhir)
+        $startDate = $this->filters['startDate'] ?? now()->subDays(6)->format('Y-m-d');
+        $endDate = $this->filters['endDate'] ?? now()->format('Y-m-d');
 
-    // Pastikan satiap tanggal ado angkonyo (walaupun 0) supayo garihnyo indak putuih
-    $chartData = $days->mapWithKeys(function($date) use ($visitors) {
-        return [$date => $visitors->get($date, 0)];
-    });
+        // 2. Buat list tanggal di antara dua range tersebut (Dynamic)
+        $period = CarbonPeriod::create($startDate, $endDate);
 
-    return [
-        'datasets' => [
-            [
-                'label' => 'Pengunjung Bulletin Kampar',
-                'data' => $chartData->values()->toArray(),
-                'fill' => 'start',
-                'borderColor' => 'rgb(59, 130, 246)',
-                'tension' => 0.4,
+        // 3. Query Data dari Model Visitor
+        $query = Visitor::query()
+            ->whereDate('accessed_at', '>=', $startDate)
+            ->whereDate('accessed_at', '<=', $endDate);
+
+        if (!$isAdmin) {
+            $query->whereHas('post', fn($q) => $q->where('user_id', $user->id));
+        }
+
+        $allVisitors = $query->get();
+
+        // 4. Petakan data ke grafik
+        $chartData = [];
+        $labels = [];
+
+        foreach ($period as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            $labels[] = $date->format('d M'); // Label bawah (Contoh: 08 Apr)
+
+            // Hitung data yang cocok dengan tanggal ini
+            $chartData[] = $allVisitors->filter(function ($visitor) use ($formattedDate) {
+                return substr($visitor->accessed_at, 0, 10) === $formattedDate;
+            })->count();
+        }
+
+        return [
+            'datasets' => [
+                [
+                    'label' => 'Jumlah Pengunjung',
+                    'data' => $chartData,
+                    'fill' => 'start',
+                    'backgroundColor' => 'rgba(59, 246, 75, 0.1)',
+                    'borderColor' => 'rgb(59, 246, 65)',
+                    'tension' => 0.4,
+                ],
             ],
-        ],
-        'labels' => $chartData->keys()->toArray(),
-    ];
-}
+            'labels' => $labels,
+        ];
+    }
 
     protected function getType(): string
     {

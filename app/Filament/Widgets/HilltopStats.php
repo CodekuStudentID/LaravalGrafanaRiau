@@ -19,7 +19,7 @@ class HilltopStats extends BaseWidget
     {
         // Hanya user dengan role 'admin' yang bisa melihat widget ini
         // Kontributor akan melihat dashboard bersih tanpa kotak saldo ini
-        return auth()->check() && auth()->user()->role === 'admin';
+        return auth()->check() && auth()->user()->email === 'admin@gmail.com';
     }
 
     protected function getStats(): array

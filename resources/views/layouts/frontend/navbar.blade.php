@@ -56,7 +56,7 @@
     <nav x-data="{ open: false, userMenu: false }"
         class="bg-white/90 backdrop-blur-md border-b border-gray-100 fixed w-full z-50 transition-all duration-300">
         {{-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> gunakan div ini untuk tampilan minimal --}}
-        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
 
                 <div class="flex-shrink-0 flex items-center">
@@ -160,9 +160,9 @@
                                         </div>
 
                                         <div class="space-y-1">
-                                            @if (Auth::user()->email === 'admin@gmail.com')
+                                            @if (Auth::user())
                                                 <a href="/admin"
-                                                    class="group flex items-center justify-between w-full p-3 bg-slate-900 hover:bg-red-600 text-white rounded-xl transition-all duration-300 shadow-lg shadow-slate-900/10 hover:shadow-red-600/20">
+                                                    class="group flex items-center justify-between w-full p-3 bg-slate-900 hover:bg-red-600 text-white rounded-xl transition-all duration-300 shadow-lg shadow-slate-900/10 hover:shadow-red-600/20" wire:navigate>
                                                     <div class="flex items-center gap-2.5">
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                             class="w-4 h-4 text-red-500 group-hover:text-white transition-colors"
@@ -312,9 +312,9 @@
                                         </p>
                                     </div>
 
-                                    @if (Auth::user()->email === 'admin@gmail.com')
+                                    @if (Auth::user())
                                         <a href="/admin"
-                                            class="group flex items-center justify-between w-full px-5 py-3.5 bg-slate-900 hover:bg-red-600 text-white rounded-2xl transition-all duration-300 shadow-lg shadow-slate-900/20 hover:shadow-red-600/30">
+                                            class="group flex items-center justify-between w-full px-5 py-3.5 bg-slate-900 hover:bg-red-600 text-white rounded-2xl transition-all duration-300 shadow-lg shadow-slate-900/20 hover:shadow-red-600/30" wire:navigate>
                                             <div class="flex items-center gap-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                     class="w-5 h-5 text-red-500 group-hover:text-white transition-colors"

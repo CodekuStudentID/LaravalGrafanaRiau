@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Section;
@@ -20,70 +17,89 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    // 1. PENGATURAN TAMPILAN SIDEBAR
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationLabel = 'Manajemen Pengguna';
+    protected static ?string $pluralModelLabel = 'Pengguna';
+    protected static ?string $navigationGroup = 'Admin Settings'; // Mengelompokkan menu admin
+
+    // 2. SISTEM KEAMANAN: HANYA ADMIN YANG BISA LIHAT MENU INI
+    public static function canViewAny(): bool
+    {
+        return auth()->user()->email === 'admin@gmail.com';
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Section::make('Informasi Akun')
-                    ->description('Kelola data profil pembaca di sini.')
+                    ->description('Kelola data pengguna/jurnalis di sini.')
                     ->schema([
                         TextInput::make('name')
                             ->label('Nama Lengkap')
+                            ->placeholder('Masukkan nama lengkap...')
                             ->required(),
+
                         TextInput::make('email')
+                            ->label('Alamat Email')
                             ->email()
+                            ->placeholder('contoh@gmail.com')
                             ->required()
                             ->unique(ignoreRecord: true),
+
                         TextInput::make('password')
+                            ->label('Password Baru')
                             ->password()
+                            ->helperText('Kosongkan jika tidak ingin mengubah password')
                             ->dehydrated(fn ($state) => filled($state))
                             ->required(fn (string $context): bool => $context === 'create'),
                     ])->columns(2),
             ]);
     }
 
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama Pembaca')
+                    ->label('Nama Pengguna')
                     ->searchable()
+                    ->sortable()
                     ->weight('bold')
                     ->color('emerald'),
 
                 TextColumn::make('email')
                     ->label('Email')
+                    ->icon('heroicon-m-envelope')
                     ->copyable()
-                    ->icon('heroicon-m-envelope'),
+                    ->searchable(),
 
-                // INDIKATOR STATUS (HIJAU JIKA AKTIF / MERAH JIKA TIDAK)
+                // INDIKATOR STATUS REAL-TIME
                 TextColumn::make('status')
-                    ->label('Status Akun')
+                    ->label('Status')
                     ->badge()
                     ->alignCenter()
                     ->state(function ($record): string {
-                        // Logika: Jika user adalah kita yang sedang login, tampilkan AKTIF
                         return auth()->id() === $record->id ? 'SEDANG LOGIN' : 'OFFLINE';
                     })
                     ->color(fn (string $state): string => match ($state) {
-                        'SEDANG LOGIN' => 'success', // Hijau
-                        'OFFLINE' => 'danger',       // Merah
+                        'SEDANG LOGIN' => 'success',
+                        'OFFLINE' => 'gray',
                     })
                     ->icon(fn (string $state): string => match ($state) {
                         'SEDANG LOGIN' => 'heroicon-m-check-circle',
-                        'OFFLINE' => 'heroicon-m-x-circle',
+                        'OFFLINE' => 'heroicon-m-minus-circle',
                     }),
 
                 TextColumn::make('created_at')
-                    ->label('Tgl Daftar')
+                    ->label('Tgl Bergabung')
                     ->dateTime('d M Y')
                     ->sortable(),
             ])
-            ->filters([])
+            ->filters([
+                // Tambahkan filter jika diperlukan di masa depan
+            ])
             ->actions([
                 Tables\Actions\EditAction::make()->button()->color('emerald'),
                 Tables\Actions\DeleteAction::make(),
@@ -97,9 +113,7 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

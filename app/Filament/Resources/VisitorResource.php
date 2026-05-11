@@ -18,12 +18,28 @@ class VisitorResource extends Resource
 
     // Icon di Sidebar (Bisa diganti sesuai selera)
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
-    
+
     protected static ?string $navigationLabel = 'Detail Pengunjung';
 
     protected static ?string $modelLabel = 'Pengunjung';
 
     protected static ?string $slug = 'detail-pengunjung';
+
+    // Tambahkan ini di dalam class VisitorResource
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        // Jika bukan admin, kunci data berdasarkan artikel milik user
+        if ($user->email !== 'admin@gmail.com') {
+            return $query->whereHas('post', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+
+        return $query;
+    }
 
     public static function form(Form $form): Form
     {
@@ -44,25 +60,25 @@ class VisitorResource extends Resource
                     ->label('Waktu')
                     ->dateTime('d M Y, H:i') // Format Indonesia banget
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('ip_address')
                     ->label('IP Pengunjung')
                     ->searchable()
-                    ->copyable() 
+                    ->copyable()
                     ->copyMessage('IP berhasil disalin')
                     ->color('primary')
                     ->weight('bold'),
 
-                Tables\Columns\TextColumn::make('post.title') 
+                Tables\Columns\TextColumn::make('post.title')
                     ->label('Berita yang Dibaca')
                     ->searchable()
                     ->limit(40)
-                    ->description(fn (Visitor $record): string => "ID Post: {$record->post_id}"),
+                    ->description(fn(Visitor $record): string => "ID Post: {$record->post_id}"),
 
                 Tables\Columns\TextColumn::make('user_agent')
                     ->label('Perangkat/Browser')
                     ->limit(30)
-                    ->tooltip(fn (Visitor $record) => $record->user_agent)
+                    ->tooltip(fn(Visitor $record) => $record->user_agent)
                     ->color('gray'),
             ])
             ->defaultSort('created_at', 'desc')
@@ -77,11 +93,11 @@ class VisitorResource extends Resource
                         return $query
                             ->when(
                                 $data['dari_tanggal'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
                             )
                             ->when(
                                 $data['sampai_tanggal'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
                             );
                     })
             ])
@@ -104,9 +120,9 @@ class VisitorResource extends Resource
     }
 
     public static function getPages(): array
-{
-    return [
-        'index' => Pages\ListVisitors::route('/'),
-    ];
-}
+    {
+        return [
+            'index' => Pages\ListVisitors::route('/'),
+        ];
+    }
 }
